@@ -10,12 +10,13 @@ import {
   analyzeCircuitTopology,
   getReferenceForFamily,
   hasInferenceApi,
+  identifyHardware,
   inferCircuitImage,
   inspectCircuitFrame,
   type ComponentReference,
+  type HardwareConclusion,
   type TopologyAnalysis,
   type CircuitDetection,
-  type CircuitComponentKind,
 } from "@/lib/circuitDetections";
 import {
   Aperture,
@@ -51,12 +52,18 @@ const NAVIGATION = [
   { label: "Settings", icon: Settings2 },
 ];
 
-const COMPONENT_FILTERS: CircuitComponentKind[] = [
-  "Resistor",
-  "Transistor",
-  "Diode",
-  "Capacitor",
-];
+const FAMILY_FILTERS = [
+  { key: "all", label: "All" },
+  { key: "passive", label: "Passives" },
+  { key: "semiconductor", label: "Semiconductors" },
+  { key: "power", label: "Power" },
+  { key: "interconnect", label: "Connectors" },
+  { key: "controller_module", label: "Modules" },
+  { key: "sensor_module", label: "Sensors" },
+  { key: "electromechanical", label: "Switches & motion" },
+  { key: "display_support", label: "Displays" },
+  { key: "other", label: "Other" },
+] as const;
 
 function ConfidenceRing({ confidence }: { confidence: number }) {
   const dash = 96 - confidence * 96;
@@ -86,11 +93,14 @@ export default function Home() {
   const [cameraState, setCameraState] = useState<"demo" | "connecting" | "live" | "blocked">("demo");
   const [showGuidance, setShowGuidance] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<CircuitComponentKind | "All">("All");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [objectQuery, setObjectQuery] = useState("");
   const [inferenceState, setInferenceState] = useState<"demo" | "waiting" | "sampling" | "live" | "error">("demo");
   const [reference, setReference] = useState<ComponentReference | null>(null);
   const [topology, setTopology] = useState<TopologyAnalysis | null>(null);
   const [topologyState, setTopologyState] = useState<"idle" | "analyzing" | "ready" | "error">("idle");
+  const [hardware, setHardware] = useState<HardwareConclusion | null>(null);
+  const [hardwareState, setHardwareState] = useState<"idle" | "analyzing" | "ready" | "error">("idle");
   const selected = detections.find((detection) => detection.id === selectedId) ?? detections[0];
 
   useEffect(() => {
@@ -161,9 +171,11 @@ export default function Home() {
     return () => { active = false; };
   }, [selected?.kind]);
 
-  const visibleDetections = activeFilter === "All"
-    ? detections
-    : detections.filter((detection) => detection.kind === activeFilter);
+  const visibleDetections = detections.filter((detection) => {
+    const inFamily = activeFilter === "all" || detection.family === activeFilter;
+    const searchable = `${detection.ref} ${detection.kind} ${detection.family} ${detection.value}`.toLowerCase();
+    return inFamily && searchable.includes(objectQuery.trim().toLowerCase());
+  });
 
   const startCamera = async () => {
     if (cameraState === "live") return;
@@ -216,6 +228,33 @@ export default function Home() {
       setTopologyState("ready");
     } catch {
       setTopologyState("error");
+    }
+  };
+
+  const identifyBoard = async () => {
+    const video = videoRef.current;
+    const canvas = frameCanvasRef.current;
+    if (!video || !canvas || !video.videoWidth) {
+      setShowGuidance(true);
+      return;
+    }
+    setHardwareState("analyzing");
+    try {
+      const scale = 640 / Math.max(video.videoWidth, video.videoHeight);
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Canvas unavailable");
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const frame = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.9));
+      if (!frame) throw new Error("Frame encoding failed");
+      const conclusion = await identifyHardware(frame);
+      setHardware(conclusion);
+      setDetections(conclusion.components);
+      setSelectedId((current) => conclusion.components.some((item) => item.id === current) ? current : (conclusion.components[0]?.id ?? current));
+      setHardwareState("ready");
+    } catch {
+      setHardwareState("error");
     }
   };
 
@@ -276,6 +315,7 @@ export default function Home() {
             <p className="workspace__intro">Position the board under even light. The active pass anchors component evidence directly to the current frame.</p>
           </div>
           <div className="workspace__heading-actions">
+            <button className="secondary-button" onClick={identifyBoard} disabled={hardwareState === "analyzing"}><Sparkles size={16} /> {hardwareState === "analyzing" ? "Concluding" : "Conclude hardware"}</button>
             <button className="secondary-button" onClick={analyzeTopology} disabled={topologyState === "analyzing"}><ClipboardCheck size={16} /> {topologyState === "analyzing" ? "Analyzing" : "Analyze topology"}</button>
             <button className="primary-button" onClick={startCamera} disabled={cameraState === "connecting"}>
               {cameraState === "connecting" ? <LoaderCircle className="spin" size={17} /> : <Camera size={17} />}
@@ -333,6 +373,7 @@ export default function Home() {
                   <div className="signal-map__legend"><span>Input trace</span><span>Component</span><span>Output trace</span></div>
                 </div>
                 {topology && <div className="topology-card"><span className="eyebrow">CIRCUIT HYPOTHESIS · REVIEW REQUIRED</span><b>{topology.candidate_patterns[0]?.label ?? "Unclassified circuit region"}</b><small>{topology.candidate_links.length} visual links · {topology.candidate_nets.length} candidate nets</small><p>{topology.candidate_patterns[0]?.evidence[0] ?? topology.limitations[0]}</p></div>}
+                {hardware && <div className={`hardware-card hardware-card--${hardware.conclusion_status === "candidate_conclusion" ? "ready" : "review"}`}><span className="eyebrow">SMART HARDWARE CONCLUSION</span><b>{hardware.conclusion}</b><small>{hardware.components.length} component candidates · {hardware.board_matches[0] ? `${Math.round(hardware.board_matches[0].confidence * 100)}% board match` : "no trained-board match"}</small><p>{hardware.evidence[0]}</p>{hardware.board_matches[1] && <em>Alternative: {hardware.board_matches[1].name} · {Math.round(hardware.board_matches[1].confidence * 100)}%</em>}<a href={hardware.board_matches[0]?.source_url} target="_blank" rel="noreferrer">Open board reference <MoveUpRight size={13} /></a></div>}
                 {reference && <div className="reference-card"><span className="eyebrow">REFERENCE MATCH</span><b>{reference.manufacturer} · {reference.part_number}</b><small>{reference.package} · {reference.reference_value}</small><a href={reference.datasheet_url} target="_blank" rel="noreferrer">Open source datasheet <MoveUpRight size={13} /></a></div>}
                 <button className="detail-link" onClick={() => setShowGuidance(true)}>Open component guide <MoveUpRight size={15} /></button>
               </>
@@ -341,7 +382,7 @@ export default function Home() {
         </section>
 
         <section className="detections-section">
-          <div className="detections-section__top"><div><p className="eyebrow">INSPECTION RECORD / PASS 01</p><h2>Objects marked in frame <span>{detections.length}</span></h2></div><div className="filter-row"><button className={`filter-pill ${activeFilter === "All" ? "filter-pill--active" : ""}`} onClick={() => setActiveFilter("All")}>All</button>{COMPONENT_FILTERS.map((filter) => <button key={filter} className={`filter-pill ${activeFilter === filter ? "filter-pill--active" : ""}`} onClick={() => setActiveFilter(filter)}>{filter}s</button>)}<button className="filter-icon" onClick={() => setShowGuidance(true)} aria-label="Filter results"><ListFilter size={17} /></button></div></div>
+          <div className="detections-section__top"><div><p className="eyebrow">INSPECTION RECORD / PASS 01</p><h2>Objects marked in frame <span>{detections.length}</span></h2><p className="object-record-note">All model-recognized objects are retained here—components, modules, connectors, sensors, displays, and controls.</p></div><div className="object-filter-tools"><label className="object-search"><span className="sr-only">Search marked objects</span><input value={objectQuery} onChange={(event) => setObjectQuery(event.target.value)} placeholder="Find a marked object" /></label><div className="filter-row">{FAMILY_FILTERS.map((filter) => <button key={filter.key} className={`filter-pill ${activeFilter === filter.key ? "filter-pill--active" : ""}`} onClick={() => setActiveFilter(filter.key)}>{filter.label}</button>)}<button className="filter-icon" onClick={() => setObjectQuery("")} aria-label="Clear object search"><ListFilter size={17} /></button></div></div></div>
           <div className="detection-list">
             {visibleDetections.map((detection, index) => (
               <button key={detection.id} className={`detection-row ${detection.id === selectedId ? "detection-row--selected" : ""}`} onClick={() => setSelectedId(detection.id)}>
@@ -370,7 +411,7 @@ export default function Home() {
             <p className="eyebrow eyebrow--signal"><span /> INSPECTION GUIDE</p>
             <h2 id="guidance-title">Steady framing produces stronger reads.</h2>
             <ol><li><span>01</span> Bring the board into even light and keep the component side unobstructed.</li><li><span>02</span> Select <b>Use camera</b> and grant access when your browser asks.</li><li><span>03</span> Hold the device steady; choose any overlay label for evidence and technical context.</li></ol>
-            <div className="modal-note"><Info size={17} /><p>This prototype uses a demonstration detector contract. A production build should send sampled frames to a secured PyTorch inference service and return validated detections in the same schema.</p></div>
+            <div className="modal-note"><Info size={17} /><p>Component candidates, board classification, and topology hypotheses are separate evidence streams. A conclusion is only shown when the board model passes its confidence/margin gate; it still requires visual and electrical review.</p></div>
           </section>
         </div>
       )}

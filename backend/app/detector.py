@@ -75,7 +75,10 @@ class TinyGridTorchScriptDetector:
                 width, height = float(offsets[2, row, column]) * 36, float(offsets[3, row, column]) * 36
                 x, y = (column + float(offsets[0, row, column])) / GRID_SIZE * 100 - width / 2, (row + float(offsets[1, row, column])) / GRID_SIZE * 100 - height / 2
                 label = labels[int(class_index)]
-                candidates.append(_record(f"{label.lower()}-{row}-{column}", label, confidence, "Likely" if confidence >= 0.75 else "Review", x, y, width, height, "Model candidate — validate package, markings, terminal assignment, and trace evidence before an engineering decision."))
+                broad_model = len(labels) > 4
+                health = "Review" if broad_model else ("Likely" if confidence >= 0.75 else "Review")
+                note = "Broad-vocabulary model candidate — confirm package, silkscreen, markings, terminal assignment, and trace evidence before an engineering decision." if broad_model else "Model candidate — validate package, markings, terminal assignment, and trace evidence before an engineering decision."
+                candidates.append(_record(f"{label.lower()}-{row}-{column}", label, confidence, health, x, y, width, height, note))
         return _nms(candidates)
 
 

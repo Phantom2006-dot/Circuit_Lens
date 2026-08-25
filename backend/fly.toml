@@ -7,9 +7,11 @@ primary_region = "iad"
 
 [env]
   PORT = "8080"
-  CONFIDENCE_THRESHOLD = "0.20"
-  MODEL_PATH = "/app/models/electrocom61-tiny-grid-baseline.pt"
-  MODEL_LABELS_PATH = "/app/models/electrocom61-tiny-grid-baseline.labels.json"
+  CONFIDENCE_THRESHOLD = "0.60"
+  MODEL_PATH = "/app/models/electrocom61-61class-tiny-grid.pt"
+  MODEL_LABELS_PATH = "/app/models/electrocom61-61class-tiny-grid.labels.json"
+  BOARD_MODEL_PATH = "/app/models/iotkits-board-classifier.pt"
+  BOARD_MODEL_LABELS_PATH = "/app/models/iotkits-board-classifier.labels.json"
 
 [http_service]
   internal_port = 8080

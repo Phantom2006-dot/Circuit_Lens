@@ -1,0 +1,13 @@
+{
+  "dataset": "ElectroCom61 v2 CC BY 4.0",
+  "split": "test",
+  "classes": 61,
+  "threshold": 0.6,
+  "iou": 0.5,
+  "true_positives": 153,
+  "false_positives": 1319,
+  "false_negatives": 996,
+  "precision": 0.1039,
+  "recall": 0.1332,
+  "caveat": "This compact baseline expands class coverage but must meet stricter validation and calibration targets before being used for verified identification."
+}

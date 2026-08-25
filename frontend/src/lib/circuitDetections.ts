@@ -11,6 +11,7 @@ export type CircuitComponentKind = string;
 export type CircuitDetection = {
   id: string;
   kind: CircuitComponentKind;
+  family: string;
   ref: string;
   confidence: number;
   health: "Verified" | "Likely" | "Review";
@@ -43,11 +44,21 @@ export type TopologyAnalysis = {
   limitations: string[];
 };
 
+export type HardwareConclusion = {
+  components: CircuitDetection[];
+  board_matches: { board_id: string; name: string; family: string; confidence: number; supported_by_trained_model: boolean; component_evidence: string[]; visual_evidence: string[]; source_url: string }[];
+  conclusion: string;
+  conclusion_status: "candidate_conclusion" | "needs_more_evidence";
+  evidence: string[];
+  next_capture: string;
+  board_model_mode: "unavailable" | "torchscript";
+};
+
 const FALLBACK_DETECTIONS: CircuitDetection[] = [
-  { id: "r7", kind: "Resistor", ref: "R7", confidence: 0.98, health: "Verified", box: { x: 16, y: 53, width: 17, height: 13 }, value: "1 kΩ · 1%", note: "Bias network — trace continuity is visible." },
-  { id: "q2", kind: "Transistor", ref: "Q2", confidence: 0.94, health: "Verified", box: { x: 47, y: 33, width: 20, height: 19 }, value: "SOT-23 · NPN", note: "Package geometry is consistent with a switching transistor." },
-  { id: "d1", kind: "Diode", ref: "D1", confidence: 0.89, health: "Likely", box: { x: 68, y: 57, width: 18, height: 12 }, value: "Signal diode", note: "Polarity mark is partially occluded by a solder joint." },
-  { id: "c4", kind: "Capacitor", ref: "C4", confidence: 0.81, health: "Review", box: { x: 42, y: 68, width: 13, height: 11 }, value: "Ceramic MLCC", note: "Marking is not visible; value requires a closer angle." },
+  { id: "r7", kind: "Resistor", family: "passive", ref: "R7", confidence: 0.98, health: "Verified", box: { x: 16, y: 53, width: 17, height: 13 }, value: "1 kΩ · 1%", note: "Bias network — trace continuity is visible." },
+  { id: "q2", kind: "Transistor", family: "semiconductor", ref: "Q2", confidence: 0.94, health: "Verified", box: { x: 47, y: 33, width: 20, height: 19 }, value: "SOT-23 · NPN", note: "Package geometry is consistent with a switching transistor." },
+  { id: "d1", kind: "Diode", family: "semiconductor", ref: "D1", confidence: 0.89, health: "Likely", box: { x: 68, y: 57, width: 18, height: 12 }, value: "Signal diode", note: "Polarity mark is partially occluded by a solder joint." },
+  { id: "c4", kind: "Capacitor", family: "passive", ref: "C4", confidence: 0.81, health: "Review", box: { x: 42, y: 68, width: 13, height: 11 }, value: "Ceramic MLCC", note: "Marking is not visible; value requires a closer angle." },
 ];
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
@@ -95,4 +106,14 @@ export async function analyzeCircuitTopology(image: Blob): Promise<TopologyAnaly
   const response = await fetch(`${API_BASE_URL}/v1/topology/analyze`, { method: "POST", body: form });
   if (!response.ok) throw new Error(`Topology analysis failed with ${response.status}`);
   return (await response.json()) as TopologyAnalysis;
+}
+
+/** Fuses the component detector and IoTKITs board classifier into a ranked conclusion. */
+export async function identifyHardware(image: Blob): Promise<HardwareConclusion> {
+  if (!API_BASE_URL) throw new Error("VITE_API_BASE_URL is not configured.");
+  const form = new FormData();
+  form.append("image", image, "hardware-identification-frame.jpg");
+  const response = await fetch(`${API_BASE_URL}/v1/hardware/identify`, { method: "POST", body: form });
+  if (!response.ok) throw new Error(`Hardware identification failed with ${response.status}`);
+  return (await response.json()) as HardwareConclusion;
 }

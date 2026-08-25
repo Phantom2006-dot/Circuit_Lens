@@ -1,0 +1,17 @@
+[
+  "arduino_due",
+  "arduino_leonardo",
+  "arduino_mega_2560",
+  "arduino_micro",
+  "arduino_nano",
+  "arduino_pro_mini",
+  "arduino_uno_r3",
+  "arduino_zero",
+  "esp32_dev_board",
+  "esp8266_wemos",
+  "jetson_nano",
+  "jetson_tx2",
+  "raspberry_pi",
+  "stm32_dev_board",
+  "telosb"
+]

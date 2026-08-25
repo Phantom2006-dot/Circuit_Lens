@@ -10,6 +10,9 @@ backend/.venv/
 # Full ElectroCom61 source download is referenced but not redistributed here.
 training/data/electrocom61/
 training/data/raw/
+training/data/electrocom61v2/
+training/data/iotkits/
+training/data/iotkits_crops/
 
 # Local credentials and archives
 .env

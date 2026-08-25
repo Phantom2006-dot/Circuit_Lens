@@ -1,0 +1,69 @@
+{
+  "dataset": "IoTKITs v1 CC BY 4.0",
+  "split": "valid",
+  "samples": 651,
+  "top1_accuracy": 0.8187,
+  "macro_recall": 0.7814,
+  "per_class": {
+    "arduino_due": {
+      "samples": 20,
+      "recall": 0.25
+    },
+    "arduino_leonardo": {
+      "samples": 20,
+      "recall": 0.6
+    },
+    "arduino_mega_2560": {
+      "samples": 60,
+      "recall": 0.3167
+    },
+    "arduino_micro": {
+      "samples": 20,
+      "recall": 0.95
+    },
+    "arduino_nano": {
+      "samples": 20,
+      "recall": 0.75
+    },
+    "arduino_pro_mini": {
+      "samples": 21,
+      "recall": 0.7619
+    },
+    "arduino_uno_r3": {
+      "samples": 80,
+      "recall": 0.8875
+    },
+    "arduino_zero": {
+      "samples": 20,
+      "recall": 0.6
+    },
+    "esp32_dev_board": {
+      "samples": 20,
+      "recall": 0.8
+    },
+    "esp8266_wemos": {
+      "samples": 40,
+      "recall": 0.975
+    },
+    "jetson_nano": {
+      "samples": 22,
+      "recall": 0.9091
+    },
+    "jetson_tx2": {
+      "samples": 22,
+      "recall": 1.0
+    },
+    "raspberry_pi": {
+      "samples": 241,
+      "recall": 0.9212
+    },
+    "stm32_dev_board": {
+      "samples": 20,
+      "recall": 1.0
+    },
+    "telosb": {
+      "samples": 25,
+      "recall": 1.0
+    }
+  }
+}

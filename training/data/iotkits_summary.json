@@ -1,0 +1,97 @@
+{
+  "dataset": "IoTKITs v1",
+  "doi": "10.17632/x5thzmkxhy.1",
+  "license": "CC BY 4.0",
+  "canonical_boards": {
+    "arduino_uno_r3": "Arduino Uno R3",
+    "arduino_nano": "Arduino Nano",
+    "arduino_mega_2560": "Arduino Mega 2560",
+    "arduino_due": "Arduino Due",
+    "arduino_micro": "Arduino Micro",
+    "arduino_pro_mini": "Arduino Pro Mini",
+    "arduino_zero": "Arduino Zero",
+    "arduino_leonardo": "Arduino Leonardo",
+    "esp32_dev_board": "ESP32 Development Board",
+    "esp32_cam": "ESP32-CAM",
+    "esp8266_wemos": "ESP8266 / Wemos Board",
+    "raspberry_pi": "Raspberry Pi",
+    "jetson_nano": "NVIDIA Jetson Nano",
+    "jetson_tx2": "NVIDIA Jetson TX2",
+    "stm32_dev_board": "STM32 Development Board",
+    "telosb": "TelosB"
+  },
+  "splits": {
+    "train": {
+      "annotations": {
+        "raspberry_pi": 965,
+        "arduino_due": 80,
+        "arduino_leonardo": 82,
+        "arduino_micro": 82,
+        "esp32_dev_board": 80,
+        "stm32_dev_board": 81,
+        "jetson_tx2": 92,
+        "jetson_nano": 90,
+        "esp8266_wemos": 160,
+        "arduino_mega_2560": 241,
+        "arduino_pro_mini": 84,
+        "arduino_uno_r3": 322,
+        "telosb": 94,
+        "arduino_nano": 82,
+        "arduino_zero": 80
+      },
+      "images": {
+        "raspberry_pi": 960,
+        "arduino_due": 80,
+        "arduino_leonardo": 80,
+        "arduino_micro": 80,
+        "stm32_dev_board": 73,
+        "jetson_tx2": 80,
+        "jetson_nano": 80,
+        "esp8266_wemos": 160,
+        "arduino_mega_2560": 240,
+        "arduino_pro_mini": 80,
+        "arduino_uno_r3": 320,
+        "telosb": 80,
+        "arduino_nano": 80,
+        "arduino_zero": 80,
+        "esp32_dev_board": 14
+      }
+    },
+    "valid": {
+      "annotations": {
+        "esp32_dev_board": 20,
+        "stm32_dev_board": 20,
+        "arduino_pro_mini": 21,
+        "raspberry_pi": 241,
+        "arduino_mega_2560": 60,
+        "arduino_uno_r3": 80,
+        "jetson_nano": 22,
+        "jetson_tx2": 22,
+        "esp8266_wemos": 40,
+        "arduino_nano": 20,
+        "arduino_zero": 20,
+        "arduino_due": 20,
+        "arduino_micro": 20,
+        "arduino_leonardo": 20,
+        "telosb": 25
+      },
+      "images": {
+        "stm32_dev_board": 20,
+        "arduino_pro_mini": 20,
+        "raspberry_pi": 240,
+        "arduino_mega_2560": 60,
+        "arduino_uno_r3": 80,
+        "jetson_nano": 20,
+        "jetson_tx2": 20,
+        "esp8266_wemos": 40,
+        "arduino_nano": 20,
+        "arduino_zero": 20,
+        "arduino_due": 20,
+        "arduino_micro": 20,
+        "arduino_leonardo": 20,
+        "telosb": 20
+      }
+    }
+  },
+  "unmapped_source_labels": []
+}

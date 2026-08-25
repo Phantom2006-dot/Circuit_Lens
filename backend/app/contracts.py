@@ -68,3 +68,24 @@ class TopologyAnalysisResponse(BaseModel):
     candidate_patterns: list[CircuitPattern]
     limitations: list[str]
     model_mode: Literal["demo", "torchscript"]
+
+
+class BoardMatch(BaseModel):
+    board_id: str
+    name: str
+    family: str
+    confidence: float = Field(ge=0, le=1)
+    supported_by_trained_model: bool
+    component_evidence: list[str]
+    visual_evidence: list[str]
+    source_url: str
+
+
+class HardwareConclusionResponse(BaseModel):
+    components: list[CircuitDetection]
+    board_matches: list[BoardMatch]
+    conclusion: str
+    conclusion_status: Literal["candidate_conclusion", "needs_more_evidence"]
+    evidence: list[str]
+    next_capture: str
+    board_model_mode: Literal["unavailable", "torchscript"]

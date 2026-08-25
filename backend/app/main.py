@@ -9,15 +9,19 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image, UnidentifiedImageError
 
+from .board_classifier import create_board_classifier
+from .boards import all_boards
 from .catalog import all_references, references_for_family
-from .contracts import DetectionResponse, TopologyAnalysisResponse
+from .contracts import DetectionResponse, HardwareConclusionResponse, TopologyAnalysisResponse
 from .detector import create_detector, demo_detections
+from .hardware import fuse_hardware_evidence
 from .topology import analyze_topology
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.detector = create_detector()
+    app.state.board_classifier = create_board_classifier()
     yield
 
 
@@ -28,7 +32,7 @@ app.add_middleware(CORSMiddleware, allow_origins=allowed_origins, allow_credenti
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "model_mode": "torchscript" if app.state.detector else "demo"}
+    return {"status": "ok", "model_mode": "torchscript" if app.state.detector else "demo", "board_model_mode": "torchscript" if app.state.board_classifier else "unavailable"}
 
 
 @app.get("/v1/catalog")
@@ -43,6 +47,11 @@ async def catalog_for_family(family: str) -> dict[str, object]:
     if not records:
         raise HTTPException(status_code=404, detail="No component references found for this family.")
     return {"references": records}
+
+
+@app.get("/v1/boards")
+async def boards() -> dict[str, object]:
+    return {"boards": all_boards()}
 
 
 @app.get("/v1/detections/demo", response_model=DetectionResponse)
@@ -85,3 +94,23 @@ async def topology_analyze(image: UploadFile = File(...)) -> TopologyAnalysisRes
     detector = app.state.detector
     detections = detector.detect(decoded) if detector else demo_detections()
     return analyze_topology(decoded, detections, "torchscript" if detector else "demo")
+
+
+@app.post("/v1/hardware/identify", response_model=HardwareConclusionResponse)
+async def identify_hardware(image: UploadFile = File(...)) -> HardwareConclusionResponse:
+    if image.content_type not in {"image/jpeg", "image/png", "image/webp"}:
+        raise HTTPException(status_code=415, detail="Upload a JPEG, PNG, or WebP image.")
+    raw = await image.read()
+    if len(raw) > 12 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Image must be 12 MB or smaller.")
+    try:
+        decoded = Image.open(io.BytesIO(raw))
+        decoded.verify()
+        decoded = Image.open(io.BytesIO(raw)).convert("RGB")
+    except (UnidentifiedImageError, OSError) as error:
+        raise HTTPException(status_code=400, detail="The upload could not be decoded as an image.") from error
+    detector = app.state.detector
+    components = detector.detect(decoded) if detector else demo_detections()
+    classifier = app.state.board_classifier
+    predictions = classifier.classify(decoded) if classifier else []
+    return fuse_hardware_evidence(predictions, components, "torchscript" if classifier else "unavailable")
