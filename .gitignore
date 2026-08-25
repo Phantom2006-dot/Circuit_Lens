@@ -15,3 +15,6 @@ training/data/raw/
 .env
 **/.env
 *.zip
+
+# Temporary local inference logs
+backend/*.log
