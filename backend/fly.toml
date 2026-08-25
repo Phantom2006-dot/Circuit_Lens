@@ -1,0 +1,30 @@
+# Replace this unique placeholder with the application name created by `fly launch`.
+app = "circuit-lens-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  CONFIDENCE_THRESHOLD = "0.20"
+  MODEL_PATH = "/app/models/electrocom61-tiny-grid-baseline.pt"
+  MODEL_LABELS_PATH = "/app/models/electrocom61-tiny-grid-baseline.labels.json"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 20
+    hard_limit = 40
+
+[[vm]]
+  memory = "1024mb"
+  cpu_kind = "shared"
+  cpus = 1

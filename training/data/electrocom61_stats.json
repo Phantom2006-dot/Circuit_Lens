@@ -1,0 +1,52 @@
+{
+  "dataset": "ElectroCom61 v2",
+  "doi": "10.17632/6scy6h8sjz.2",
+  "license": "CC BY 4.0",
+  "source_url": "https://data.mendeley.com/datasets/6scy6h8sjz/2",
+  "original_class_count": 61,
+  "canonical_families": [
+    "Resistor",
+    "Transistor",
+    "Diode",
+    "Capacitor"
+  ],
+  "mapped_original_classes": {
+    "7": "BJT-Transistor",
+    "13": "Capacitor-10mf",
+    "14": "Capacitor-470mf",
+    "16": "Diode",
+    "20": "Film-Capacitor",
+    "26": "High-Voltage-Ceramic-Capacitor",
+    "31": "IGBT",
+    "38": "Low-Voltage-Ceramic-Capacitor",
+    "39": "MLC-Capacitor",
+    "40": "MOSFET",
+    "50": "Resistor",
+    "60": "Zener-Diode"
+  },
+  "images_with_target_labels": {
+    "train": 537,
+    "valid": 260,
+    "test": 48
+  },
+  "annotations_by_split": {
+    "train": {
+      "Resistor": 118,
+      "Transistor": 240,
+      "Diode": 353,
+      "Capacitor": 973
+    },
+    "valid": {
+      "Resistor": 33,
+      "Transistor": 349,
+      "Diode": 127,
+      "Capacitor": 340
+    },
+    "test": {
+      "Resistor": 18,
+      "Transistor": 63,
+      "Diode": 23,
+      "Capacitor": 68
+    }
+  }
+}

@@ -1,0 +1,9 @@
+nohup: ignoring input
+INFO:     Started server process [6420]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     10.133.33.1:42726 - "HEAD /health HTTP/1.1" 405 Method Not Allowed
+INFO:     10.133.33.1:42730 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.133.33.1:50278 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.133.33.1:52206 - "POST /v1/topology/analyze HTTP/1.1" 200 OK
