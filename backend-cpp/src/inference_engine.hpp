@@ -17,6 +17,11 @@ struct Detection {
 };
 
 struct BoardPrediction { std::string board_id; float confidence{}; };
+struct SnapshotPrediction { std::string label; float confidence{}; };
+struct MicrocontrollerEvidence {
+  std::string id, name, family, package, source_url;
+  std::vector<std::string> signatures;
+};
 
 class InferenceEngine {
  public:
@@ -25,9 +30,12 @@ class InferenceEngine {
 
   bool component_ready() const { return component_ready_; }
   bool board_ready() const { return board_ready_; }
+  bool snapshot_component_ready() const { return snapshot_component_ready_; }
   std::vector<Detection> detect(const cv::Mat& bgr);
   std::vector<BoardPrediction> classify(const cv::Mat& bgr);
+  std::vector<SnapshotPrediction> classify_snapshot_component(const cv::Mat& bgr);
   std::vector<std::string> extract_markings(const cv::Mat& bgr);
+  nlohmann::json microcontroller_evidence(const std::vector<std::string>& markings) const;
   nlohmann::json hardware_response(const cv::Mat& bgr);
   nlohmann::json topology_response(const cv::Mat& bgr);
   nlohmann::json component_catalog() const;
@@ -39,9 +47,9 @@ class InferenceEngine {
  private:
   std::filesystem::path data_dir_;
   float threshold_;
-  bool component_ready_{false}, board_ready_{false}, ocr_ready_{false};
-  torch::jit::script::Module component_model_, board_model_;
-  std::vector<std::string> component_labels_, board_labels_;
+  bool component_ready_{false}, board_ready_{false}, snapshot_component_ready_{false}, ocr_ready_{false};
+  torch::jit::script::Module component_model_, board_model_, snapshot_component_model_;
+  std::vector<std::string> component_labels_, board_labels_, snapshot_component_labels_;
   nlohmann::json component_catalog_{nlohmann::json::array()}, board_catalog_{nlohmann::json::array()};
   tesseract::TessBaseAPI ocr_;
 

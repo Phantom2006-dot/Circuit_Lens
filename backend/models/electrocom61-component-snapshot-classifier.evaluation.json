@@ -1,0 +1,11 @@
+{
+  "dataset": "ElectroCom61 v2 CC BY 4.0",
+  "validation": {
+    "top1_accuracy": 0.6142307692307692,
+    "samples": 2600
+  },
+  "epochs": 12,
+  "train_crops": 9188,
+  "valid_crops": 2600,
+  "usage": "review-only close-up snapshot component candidates"
+}

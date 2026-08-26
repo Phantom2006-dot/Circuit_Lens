@@ -7,6 +7,8 @@ export MODEL_PATH="${MODEL_PATH:-$ROOT/backend/models/electrocom61-61class-tiny-
 export MODEL_LABELS_PATH="${MODEL_LABELS_PATH:-$ROOT/backend/models/electrocom61-61class-tiny-grid.labels.json}"
 export BOARD_MODEL_PATH="${BOARD_MODEL_PATH:-$ROOT/backend/models/iotkits-board-classifier.pt}"
 export BOARD_MODEL_LABELS_PATH="${BOARD_MODEL_LABELS_PATH:-$ROOT/backend/models/iotkits-board-classifier.labels.json}"
+export SNAPSHOT_COMPONENT_MODEL_PATH="${SNAPSHOT_COMPONENT_MODEL_PATH:-$ROOT/backend/models/electrocom61-component-snapshot-classifier.pt}"
+export SNAPSHOT_COMPONENT_MODEL_LABELS_PATH="${SNAPSHOT_COMPONENT_MODEL_LABELS_PATH:-$ROOT/backend/models/electrocom61-component-snapshot-classifier.labels.json}"
 export CONFIDENCE_THRESHOLD="${CONFIDENCE_THRESHOLD:-0.60}"
 export PORT="${PORT:-8080}"
 exec "$ROOT/backend-cpp/build/circuit_lens_native"

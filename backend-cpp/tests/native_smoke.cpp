@@ -14,6 +14,14 @@ int main() {
     std::cerr << result.dump(2) << "\n";
     return 1;
   }
-  std::cout << "Native C++ silkscreen evidence smoke test passed.\n";
+  cv::Mat microcontroller_canvas(620, 2300, CV_8UC3, cv::Scalar(255, 255, 255));
+  cv::putText(microcontroller_canvas, "ATMEGA328P", cv::Point(80, 340), cv::FONT_HERSHEY_SIMPLEX, 3.5, cv::Scalar(0, 0, 0), 8, cv::LINE_AA);
+  const auto markings = engine.extract_markings(microcontroller_canvas);
+  const auto microcontrollers = engine.microcontroller_evidence(markings);
+  if (microcontrollers.empty() || microcontrollers[0].value("id", "") != "atmega328p") {
+    std::cerr << microcontrollers.dump(2) << "\n";
+    return 2;
+  }
+  std::cout << "Native C++ board and bare-microcontroller silkscreen evidence smoke test passed.\n";
   return 0;
 }

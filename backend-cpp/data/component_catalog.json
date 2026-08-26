@@ -122,5 +122,44 @@
     "source_title": "Molex 0022232041 product page",
     "source_url": "https://www.molex.com/en-us/products/part-detail/22232041",
     "application": "Board-to-wire and board-to-board interconnects."
+  },
+  {
+    "key": "microcontroller-atmega328p",
+    "family": "Microcontroller",
+    "manufacturer": "Microchip",
+    "part_number": "ATmega328P",
+    "package": "DIP-28 / TQFP-32 / QFN-32",
+    "reference_value": "AVR 8-bit microcontroller",
+    "engineering_summary": "Marking-assisted reference only; verify the complete top marking and package before use.",
+    "datasheet_url": "https://www.microchip.com/en-us/product/atmega328p",
+    "source_title": "Microchip ATmega328P product page",
+    "source_url": "https://www.microchip.com/en-us/product/atmega328p",
+    "application": "Embedded control and common Arduino-family designs."
+  },
+  {
+    "key": "microcontroller-stm32f103",
+    "family": "Microcontroller",
+    "manufacturer": "STMicroelectronics",
+    "part_number": "STM32F103",
+    "package": "LQFP-48 / LQFP-64",
+    "reference_value": "ARM Cortex-M3 microcontroller",
+    "engineering_summary": "Marking-assisted reference only; suffix and package must be confirmed from the full top marking.",
+    "datasheet_url": "https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html",
+    "source_title": "STMicroelectronics STM32F103 product family",
+    "source_url": "https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html",
+    "application": "General-purpose embedded control."
+  },
+  {
+    "key": "microcontroller-rp2040",
+    "family": "Microcontroller",
+    "manufacturer": "Raspberry Pi",
+    "part_number": "RP2040",
+    "package": "QFN-56",
+    "reference_value": "Dual-core ARM Cortex-M0+ microcontroller",
+    "engineering_summary": "Direct RP2040 package marking can support a reviewable controller candidate, not a board identity.",
+    "datasheet_url": "https://www.raspberrypi.com/products/rp2040/",
+    "source_title": "Raspberry Pi RP2040 product page",
+    "source_url": "https://www.raspberrypi.com/products/rp2040/",
+    "application": "RP2040 and Pico-derived embedded designs."
   }
 ]

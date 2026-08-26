@@ -26,7 +26,11 @@ add_executable(circuit_lens_native_smoke
   tests/native_smoke.cpp
   src/inference_engine.cpp
 )
-foreach(target circuit_lens_native circuit_lens_native_smoke)
+add_executable(circuit_lens_snapshot_inspect
+  tests/snapshot_inspect.cpp
+  src/inference_engine.cpp
+)
+foreach(target circuit_lens_native circuit_lens_native_smoke circuit_lens_snapshot_inspect)
 target_include_directories(${target} PRIVATE ${OpenCV_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(${target} PRIVATE
   ${TORCH_LIBRARIES}
