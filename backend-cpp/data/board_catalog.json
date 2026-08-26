@@ -1,0 +1,481 @@
+[
+  {
+    "id": "arduino_uno_r3",
+    "name": "Arduino Uno R3",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "ATmega328P",
+      "USB Type-B",
+      "barrel jack",
+      "14 digital pins",
+      "DIP or SMD MCU"
+    ],
+    "visual_cues": [
+      "Blue rectangular board",
+      "large USB Type-B connector",
+      "black barrel jack",
+      "two long header rows"
+    ],
+    "source_title": "Arduino UNO R3 hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/uno-rev3/",
+    "specifications": {
+      "MCU": "ATmega328P",
+      "Digital I/O": "14",
+      "Analog inputs": "6",
+      "Clock": "16 MHz"
+    }
+  },
+  {
+    "id": "arduino_nano",
+    "name": "Arduino Nano",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "ATmega328P",
+      "Mini-B USB",
+      "breadboard form factor"
+    ],
+    "visual_cues": [
+      "Narrow breadboard board",
+      "Mini-B USB",
+      "two 15-pin header rows"
+    ],
+    "source_title": "Arduino Nano hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/nano/",
+    "specifications": {
+      "Dimensions": "45 × 18 mm",
+      "Form factor": "Breadboard friendly",
+      "MCU": "ATmega328P"
+    }
+  },
+  {
+    "id": "arduino_nano_esp32",
+    "name": "Arduino Nano ESP32",
+    "manufacturer": "Arduino",
+    "family": "Wireless microcontroller board",
+    "supported_by_trained_model": false,
+    "model_evidence": [
+      "NORA-W106",
+      "ESP32-S3",
+      "USB-C connector",
+      "Arduino Nano ESP32 silkscreen"
+    ],
+    "visual_cues": [
+      "Nano form factor",
+      "USB-C connector",
+      "dual header rows",
+      "NORA-W106 module"
+    ],
+    "source_title": "Arduino Nano ESP32 documentation",
+    "source_url": "https://docs.arduino.cc/hardware/nano-esp32",
+    "specifications": {
+      "Module": "u-blox NORA-W106",
+      "Chip": "ESP32-S3",
+      "Wireless": "Wi-Fi and Bluetooth 5",
+      "Current model status": "Marking-assisted reference until labelled photographs are added to training"
+    }
+  },
+  {
+    "id": "arduino_mega_2560",
+    "name": "Arduino Mega 2560 Rev3",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "ATmega2560",
+      "54 digital pins",
+      "16 analog inputs",
+      "4 UARTs"
+    ],
+    "visual_cues": [
+      "Large Arduino outline",
+      "extra-long pin headers",
+      "USB Type-B connector"
+    ],
+    "source_title": "Arduino Mega 2560 Rev3 hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/mega-2560/",
+    "specifications": {
+      "MCU": "ATmega2560",
+      "Digital I/O": "54",
+      "Analog inputs": "16",
+      "UARTs": "4"
+    }
+  },
+  {
+    "id": "arduino_due",
+    "name": "Arduino Due",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Arduino Due label",
+      "ARM SAM3X family"
+    ],
+    "visual_cues": [
+      "Large Arduino-compatible outline",
+      "two USB ports",
+      "extended headers"
+    ],
+    "source_title": "Arduino hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/",
+    "specifications": {
+      "Platform": "Arduino Due",
+      "Architecture": "ARM"
+    }
+  },
+  {
+    "id": "arduino_leonardo",
+    "name": "Arduino Leonardo",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Arduino Leonardo label",
+      "ATmega32U4 family"
+    ],
+    "visual_cues": [
+      "Arduino-sized board",
+      "micro USB connector",
+      "standard header arrangement"
+    ],
+    "source_title": "Arduino hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/",
+    "specifications": {
+      "Platform": "Arduino Leonardo",
+      "Architecture": "AVR"
+    }
+  },
+  {
+    "id": "arduino_micro",
+    "name": "Arduino Micro",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Arduino Micro label",
+      "ATmega32U4 family"
+    ],
+    "visual_cues": [
+      "Slim microcontroller board",
+      "micro USB",
+      "dual headers"
+    ],
+    "source_title": "Arduino hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/",
+    "specifications": {
+      "Platform": "Arduino Micro",
+      "Architecture": "AVR"
+    }
+  },
+  {
+    "id": "arduino_pro_mini",
+    "name": "Arduino Pro Mini",
+    "manufacturer": "Arduino-compatible",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Pro Mini silkscreen",
+      "ATmega328P family"
+    ],
+    "visual_cues": [
+      "Small USB-less board",
+      "six-pin programming header",
+      "dual pin rows"
+    ],
+    "source_title": "Arduino hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/",
+    "specifications": {
+      "Platform": "Arduino Pro Mini",
+      "Architecture": "AVR"
+    }
+  },
+  {
+    "id": "arduino_zero",
+    "name": "Arduino Zero",
+    "manufacturer": "Arduino",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Arduino Zero label",
+      "SAMD21 family"
+    ],
+    "visual_cues": [
+      "Arduino-sized board",
+      "native USB",
+      "debug connector"
+    ],
+    "source_title": "Arduino hardware documentation",
+    "source_url": "https://docs.arduino.cc/hardware/",
+    "specifications": {
+      "Platform": "Arduino Zero",
+      "Architecture": "ARM Cortex-M0+"
+    }
+  },
+  {
+    "id": "esp32_dev_board",
+    "name": "ESP32 Development Board",
+    "manufacturer": "Espressif / compatible",
+    "family": "Wireless microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "ESP32 module",
+      "dual header rows",
+      "USB-to-UART interface"
+    ],
+    "visual_cues": [
+      "Small narrow board",
+      "metal RF can",
+      "antenna zone",
+      "two pin rows"
+    ],
+    "source_title": "Espressif ESP32-DevKitC documentation",
+    "source_url": "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html",
+    "specifications": {
+      "Platform": "ESP32",
+      "I/O": "Most I/O broken out to side headers",
+      "Wireless": "Wi‑Fi and Bluetooth family"
+    }
+  },
+  {
+    "id": "esp32_cam",
+    "name": "ESP32-CAM",
+    "manufacturer": "AI-Thinker compatible",
+    "family": "Wireless camera microcontroller board",
+    "supported_by_trained_model": false,
+    "model_evidence": [
+      "ESP32-S module",
+      "camera ribbon connector",
+      "OV2640 camera",
+      "microSD slot"
+    ],
+    "visual_cues": [
+      "Compact board",
+      "camera socket or attached camera",
+      "metal RF can",
+      "microSD connector"
+    ],
+    "source_title": "Espressif camera application reference",
+    "source_url": "https://docs.espressif.com/projects/esp-faq/en/latest/application-solution/camera-application.html",
+    "specifications": {
+      "Platform": "ESP32 camera-capable family",
+      "Camera support": "ESP32 camera driver",
+      "Current model status": "Reference-only until ESP32-CAM images are added to training"
+    }
+  },
+  {
+    "id": "esp32_wroom_32",
+    "name": "ESP32-WROOM-32 Module",
+    "manufacturer": "Espressif",
+    "family": "Wireless microcontroller module",
+    "supported_by_trained_model": false,
+    "model_evidence": [
+      "ESP-WROOM-32 silkscreen",
+      "metal RF can",
+      "PCB antenna"
+    ],
+    "visual_cues": [
+      "Compact castellated module",
+      "metal RF shield",
+      "meander antenna zone"
+    ],
+    "source_title": "Espressif ESP32-WROOM-32 documentation",
+    "source_url": "https://documentation.espressif.com/esp32-wroom-32_datasheet_en.html",
+    "specifications": {
+      "Platform": "ESP32",
+      "Wireless": "Wi-Fi and Bluetooth",
+      "Current model status": "Marking-assisted reference until module photographs are added to training"
+    }
+  },
+  {
+    "id": "esp32_s3_devkitc",
+    "name": "ESP32-S3-DevKitC-1",
+    "manufacturer": "Espressif",
+    "family": "Wireless microcontroller board",
+    "supported_by_trained_model": false,
+    "model_evidence": [
+      "ESP32-S3-WROOM module",
+      "USB connector",
+      "dual pin headers"
+    ],
+    "visual_cues": [
+      "Narrow development board",
+      "ESP32-S3 module",
+      "USB connector",
+      "dual header rows"
+    ],
+    "source_title": "Espressif ESP32-S3-DevKitC-1 documentation",
+    "source_url": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/index.html",
+    "specifications": {
+      "Platform": "ESP32-S3",
+      "Wireless": "Wi-Fi and Bluetooth LE",
+      "Current model status": "Marking-assisted reference until labelled photographs are added to training"
+    }
+  },
+  {
+    "id": "esp8266_wemos",
+    "name": "ESP8266 / Wemos Board",
+    "manufacturer": "ESP8266 compatible",
+    "family": "Wireless microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "ESP8266 module",
+      "small USB connector",
+      "narrow two-header board"
+    ],
+    "visual_cues": [
+      "Narrow board",
+      "small RF module or antenna",
+      "micro USB connector"
+    ],
+    "source_title": "IoTKITs board dataset label",
+    "source_url": "https://data.mendeley.com/datasets/x5thzmkxhy/1",
+    "specifications": {
+      "Platform": "ESP8266 / Wemos class",
+      "Model data": "IoTKITs CC BY 4.0"
+    }
+  },
+  {
+    "id": "jetson_nano",
+    "name": "NVIDIA Jetson Nano",
+    "manufacturer": "NVIDIA",
+    "family": "Edge AI developer kit",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Jetson module",
+      "40-pin header",
+      "heatsink or carrier-board layout"
+    ],
+    "visual_cues": [
+      "Large carrier board",
+      "40-pin GPIO header",
+      "camera connector",
+      "Jetson module/heatsink"
+    ],
+    "source_title": "IoTKITs board dataset label",
+    "source_url": "https://data.mendeley.com/datasets/x5thzmkxhy/1",
+    "specifications": {
+      "Platform": "Jetson Nano",
+      "Model data": "IoTKITs CC BY 4.0"
+    }
+  },
+  {
+    "id": "jetson_tx2",
+    "name": "NVIDIA Jetson TX2",
+    "manufacturer": "NVIDIA",
+    "family": "Edge AI developer kit",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Jetson TX2 module",
+      "carrier board",
+      "40-pin header"
+    ],
+    "visual_cues": [
+      "Large carrier board",
+      "Jetson module",
+      "camera/display connectors"
+    ],
+    "source_title": "IoTKITs board dataset label",
+    "source_url": "https://data.mendeley.com/datasets/x5thzmkxhy/1",
+    "specifications": {
+      "Platform": "Jetson TX2",
+      "Model data": "IoTKITs CC BY 4.0"
+    }
+  },
+  {
+    "id": "jetson_orin_nano_super",
+    "name": "NVIDIA Jetson Orin Nano Super Developer Kit",
+    "manufacturer": "NVIDIA",
+    "family": "Edge AI developer kit",
+    "supported_by_trained_model": false,
+    "model_evidence": [
+      "Jetson Orin Nano module",
+      "carrier board",
+      "40-pin header"
+    ],
+    "visual_cues": [
+      "Compact Jetson carrier",
+      "module/heatsink",
+      "camera/display connectors"
+    ],
+    "source_title": "NVIDIA Jetson Orin Nano Super Developer Kit",
+    "source_url": "https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/",
+    "specifications": {
+      "AI performance": "67 INT8 TOPS",
+      "GPU": "1024 CUDA cores / 32 tensor cores",
+      "Memory": "8 GB LPDDR5",
+      "Power": "7–25 W",
+      "Current model status": "Reference-only until image data is added to training"
+    }
+  },
+  {
+    "id": "raspberry_pi",
+    "name": "Raspberry Pi",
+    "manufacturer": "Raspberry Pi",
+    "family": "Single-board computer",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "Raspberry Pi board",
+      "40-pin GPIO",
+      "USB/Ethernet connector group"
+    ],
+    "visual_cues": [
+      "Credit-card board",
+      "40-pin GPIO header",
+      "USB connectors",
+      "HDMI"
+    ],
+    "source_title": "IoTKITs board dataset label",
+    "source_url": "https://data.mendeley.com/datasets/x5thzmkxhy/1",
+    "specifications": {
+      "Model data": "IoTKITs CC BY 4.0"
+    }
+  },
+  {
+    "id": "stm32_dev_board",
+    "name": "STM32 Development Board",
+    "manufacturer": "STMicroelectronics / compatible",
+    "family": "Microcontroller board",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "STM32 MCU",
+      "ST-LINK or USB connector",
+      "dual headers"
+    ],
+    "visual_cues": [
+      "Small controller board",
+      "USB/debug connector",
+      "dual pin headers"
+    ],
+    "source_title": "IoTKITs board dataset label",
+    "source_url": "https://data.mendeley.com/datasets/x5thzmkxhy/1",
+    "specifications": {
+      "Platform": "STM32 class",
+      "Model data": "IoTKITs CC BY 4.0"
+    }
+  },
+  {
+    "id": "telosb",
+    "name": "TelosB",
+    "manufacturer": "Crossbow / compatible",
+    "family": "Wireless sensor node",
+    "supported_by_trained_model": true,
+    "model_evidence": [
+      "TelosB label",
+      "sensor-node form factor"
+    ],
+    "visual_cues": [
+      "Slim sensor board",
+      "antenna region",
+      "dual headers"
+    ],
+    "source_title": "IoTKITs board dataset label",
+    "source_url": "https://data.mendeley.com/datasets/x5thzmkxhy/1",
+    "specifications": {
+      "Platform": "TelosB",
+      "Model data": "IoTKITs CC BY 4.0"
+    }
+  }
+]

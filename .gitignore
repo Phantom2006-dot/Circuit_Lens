@@ -21,3 +21,8 @@ training/data/iotkits_crops/
 
 # Temporary local inference logs
 backend/*.log
+
+# Native C++ build output and runtime logs
+backend-cpp/build/
+native-app/build/
+native-app/*.log
