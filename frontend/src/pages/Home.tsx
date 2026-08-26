@@ -431,10 +431,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="method-strip">
+        <section className="method-strip" aria-label="Inspection output tray">
           <div className="method-strip__image"><img src="/assets/circuit-lens-bench-detail.png" alt="Macro circuit board detail" /></div>
-          <div className="method-strip__copy"><p className="eyebrow eyebrow--signal"><span /> PYTORCH-READY PIPELINE</p><h2>Camera frames in. Component intelligence out.</h2><p>This web prototype isolates detection behind a portable frame-inspection contract. Connect a PyTorch detector through a secure API now, then reuse the same output schema with a React Native camera adapter later.</p></div>
-          <button className="method-strip__link" onClick={() => setShowGuidance(true)}>Inspect frame contract <MoveUpRight size={18} /></button>
+          <div className="method-strip__copy"><p className="eyebrow">OUTPUT TRAY / PASS 01</p><h2>Capture evidence before you touch the board.</h2><p>Wide front-side framing, legible silkscreen, connector geometry, and a steady focus pass give the inspection record its strongest board and module evidence.</p></div>
+          <div className="method-strip__action"><span className="method-strip__stamp">BENCH A · SIDE A</span><button className="method-strip__link" onClick={() => setShowGuidance(true)}>Open capture protocol <MoveUpRight size={18} /></button></div>
         </section>
       </section>
 
