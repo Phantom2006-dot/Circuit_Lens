@@ -12,9 +12,11 @@ import {
   hasInferenceApi,
   identifyHardware,
   inferCircuitImage,
+  inspectSnapshot,
   inspectCircuitFrame,
   type ComponentReference,
   type HardwareConclusion,
+  type SnapshotInspection,
   type TopologyAnalysis,
   type CircuitDetection,
 } from "@/lib/circuitDetections";
@@ -30,6 +32,7 @@ import {
   Focus,
   Gauge,
   History,
+  ImagePlus,
   Info,
   Layers3,
   ListFilter,
@@ -43,7 +46,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 const NAVIGATION = [
   { label: "Inspect", icon: Aperture, active: true },
@@ -93,6 +96,7 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const frameCanvasRef = useRef<HTMLCanvasElement>(null);
+  const snapshotInputRef = useRef<HTMLInputElement>(null);
   const inferenceInFlightRef = useRef(false);
   const [detections, setDetections] = useState<CircuitDetection[]>([]);
   const [selectedId, setSelectedId] = useState("q2");
@@ -109,6 +113,11 @@ export default function Home() {
   const [topologyState, setTopologyState] = useState<"idle" | "analyzing" | "ready" | "error">("idle");
   const [hardware, setHardware] = useState<HardwareConclusion | null>(null);
   const [hardwareState, setHardwareState] = useState<"idle" | "analyzing" | "ready" | "error">("idle");
+  const [snapshot, setSnapshot] = useState<SnapshotInspection | null>(null);
+  const [snapshotState, setSnapshotState] = useState<"idle" | "analyzing" | "ready" | "error">("idle");
+  const [snapshotName, setSnapshotName] = useState("");
+  const [correction, setCorrection] = useState("");
+  const [correctionSaved, setCorrectionSaved] = useState(false);
   const selected = detections.find((detection) => detection.id === selectedId) ?? detections[0];
 
   useEffect(() => {
@@ -277,6 +286,51 @@ export default function Home() {
     }
   };
 
+  const inspectSnapshotBlob = async (image: Blob, name: string) => {
+    setSnapshotState("analyzing");
+    setSnapshotName(name);
+    setCorrectionSaved(false);
+    try {
+      setSnapshot(await inspectSnapshot(image));
+      setSnapshotState("ready");
+    } catch {
+      setSnapshotState("error");
+    }
+  };
+
+  const captureSnapshot = async () => {
+    const video = videoRef.current;
+    const canvas = frameCanvasRef.current;
+    if (!video || !canvas || !video.videoWidth) {
+      setShowGuidance(true);
+      return;
+    }
+    const scale = 960 / Math.max(video.videoWidth, video.videoHeight);
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const frame = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
+    if (frame) await inspectSnapshotBlob(frame, `Camera snapshot · ${new Date().toLocaleTimeString()}`);
+  };
+
+  const uploadSnapshot = async (event: ChangeEvent<HTMLInputElement>) => {
+    const image = event.target.files?.[0];
+    event.target.value = "";
+    if (image) await inspectSnapshotBlob(image, image.name);
+  };
+
+  const saveCorrection = () => {
+    const identity = correction.trim();
+    if (!identity || !snapshot) return;
+    const key = "circuit-lens-user-corrections";
+    const current = JSON.parse(localStorage.getItem(key) ?? "[]") as unknown[];
+    current.push({ timestamp: new Date().toISOString(), identity, snapshot: snapshotName, outcome: snapshot, status: "user_supplied_not_model_verified" });
+    localStorage.setItem(key, JSON.stringify(current));
+    setCorrectionSaved(true);
+  };
+
   const runFocusedAnalysis = () => {
     if (inspectionMode === "board") {
       void identifyBoard();
@@ -388,7 +442,7 @@ export default function Home() {
 
             <div className="lens-stage__controls">
               <div className="control-group"><span>Overlay</span><button className="mode-button mode-button--active" aria-label="Show labels"><Crosshair size={16} /></button><button className="mode-button" onClick={() => setShowGuidance(true)} aria-label="Show traces"><ScanLine size={16} /></button><button className="mode-button" onClick={() => setShowGuidance(true)} aria-label="Show values"><Gauge size={16} /></button></div>
-              <div className="control-group control-group--end"><button className="text-control" onClick={() => setIsScanning((value) => !value)}>{isScanning ? <Pause size={15} /> : <Focus size={15} />}{isScanning ? "Pause scan" : "Resume scan"}</button><button className="mode-button" onClick={() => setShowGuidance(true)} aria-label="Expand viewport"><Expand size={16} /></button></div>
+              <div className="control-group control-group--end"><button className="text-control" onClick={() => void captureSnapshot()} disabled={snapshotState === "analyzing" || !hasInferenceApi()}><Camera size={15} />{snapshotState === "analyzing" ? "Inspecting" : "Snapshot"}</button><button className="text-control" onClick={() => snapshotInputRef.current?.click()} disabled={!hasInferenceApi()}><ImagePlus size={15} />Upload</button><input ref={snapshotInputRef} className="snapshot-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void uploadSnapshot(event)} /><button className="text-control" onClick={() => setIsScanning((value) => !value)}>{isScanning ? <Pause size={15} /> : <Focus size={15} />}{isScanning ? "Pause scan" : "Resume scan"}</button><button className="mode-button" onClick={() => setShowGuidance(true)} aria-label="Expand viewport"><Expand size={16} /></button></div>
             </div>
           </article>
 
@@ -407,7 +461,8 @@ export default function Home() {
                   <div className="signal-map__legend"><span>Input trace</span><span>Component</span><span>Output trace</span></div>
                 </div>
                 {topology && <div className="topology-card"><span className="eyebrow">CIRCUIT HYPOTHESIS · REVIEW REQUIRED</span><b>{topology.candidate_patterns[0]?.label ?? "Unclassified circuit region"}</b><small>{topology.candidate_links.length} visual links · {topology.candidate_nets.length} candidate nets</small><p>{topology.candidate_patterns[0]?.evidence[0] ?? topology.limitations[0]}</p></div>}
-                {hardware && <div className={`hardware-card hardware-card--${hardware.conclusion_status === "candidate_conclusion" ? "ready" : "review"}`}><span className="eyebrow">SMART HARDWARE CONCLUSION</span><b>{hardware.conclusion}</b><small>{hardware.components.length} component candidates · {hardware.board_matches[0] ? `${Math.round(hardware.board_matches[0].confidence * 100)}% board match` : "no trained-board match"}</small><p>{hardware.evidence[0]}</p>{hardware.recognized_markings.length > 0 && <em>Marking read: {hardware.recognized_markings.join(" · ")}</em>}{hardware.board_matches[1] && <em>Alternative: {hardware.board_matches[1].name} · {Math.round(hardware.board_matches[1].confidence * 100)}%</em>}<a href={hardware.board_matches[0]?.source_url} target="_blank" rel="noreferrer">Open board reference <MoveUpRight size={13} /></a></div>}
+                {hardware && <div className={`hardware-card hardware-card--${hardware.conclusion_status === "candidate_conclusion" ? "ready" : "review"}`}><span className="eyebrow">SMART HARDWARE CONCLUSION</span><b>{hardware.conclusion}</b><small>{hardware.components.length} component candidates · {hardware.board_matches[0] ? `${Math.round(hardware.board_matches[0].confidence * 100)}% board match` : "no trained-board match"}</small><p>{hardware.evidence[0]}</p>{hardware.recognized_markings.length > 0 && <em>Marking read: {hardware.recognized_markings.join(" · ")}</em>}{hardware.microcontroller_evidence?.map((item) => <em key={item.id}>Bare microcontroller candidate: {item.name} · {item.package} · review only</em>)}{hardware.board_matches[1] && <em>Alternative: {hardware.board_matches[1].name} · {Math.round(hardware.board_matches[1].confidence * 100)}%</em>}{hardware.board_matches[0]?.source_url && <a href={hardware.board_matches[0].source_url} target="_blank" rel="noreferrer">Open board reference <MoveUpRight size={13} /></a>}</div>}
+                {snapshot && <div className={`hardware-card hardware-card--${snapshot.microcontroller_evidence.length > 0 || snapshot.snapshot_component_candidates[0]?.confidence >= 0.55 ? "ready" : "review"}`}><span className="eyebrow">SAVED SNAPSHOT / REVIEW</span><b>{snapshot.microcontroller_evidence[0]?.name ?? (snapshot.snapshot_component_candidates[0] ? `${snapshot.snapshot_component_candidates[0].label.split("-").join(" ")} close-up candidate` : "No reliable snapshot candidate")}</b><small>{snapshotName} · model rankings are review-only</small><p>{snapshot.guidance}</p>{snapshot.recognized_markings.length > 0 && <em>Marking read: {snapshot.recognized_markings.join(" · ")}</em>}{snapshot.microcontroller_evidence.map((item) => <em key={item.id}>Microcontroller: {item.family} · {item.package} · <a href={item.source_url} target="_blank" rel="noreferrer">reference</a></em>)}{snapshot.snapshot_component_candidates.map((item) => <em key={item.label}>{item.label.split("-").join(" ")} · {Math.round(item.confidence * 100)}% · review</em>)}<div className="snapshot-correction"><input value={correction} onChange={(event) => { setCorrection(event.target.value); setCorrectionSaved(false); }} placeholder="Tell us what it is" /><button onClick={saveCorrection} disabled={!correction.trim()}>{correctionSaved ? "Saved locally" : "Save correction"}</button></div></div>}
                 {reference && <div className="reference-card"><span className="eyebrow">REFERENCE MATCH</span><b>{reference.manufacturer} · {reference.part_number}</b><small>{reference.package} · {reference.reference_value}</small><a href={reference.datasheet_url} target="_blank" rel="noreferrer">Open source datasheet <MoveUpRight size={13} /></a></div>}
                 <button className="detail-link" onClick={() => setShowGuidance(true)}>Open component guide <MoveUpRight size={15} /></button>
               </>

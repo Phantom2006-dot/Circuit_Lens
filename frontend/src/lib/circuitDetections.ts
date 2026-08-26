@@ -47,12 +47,21 @@ export type TopologyAnalysis = {
 export type HardwareConclusion = {
   components: CircuitDetection[];
   board_matches: { board_id: string; name: string; family: string; confidence: number; supported_by_trained_model: boolean; component_evidence: string[]; marking_evidence: string[]; visual_evidence: string[]; source_url: string }[];
+  microcontroller_evidence?: { id: string; name: string; family: string; package: string; source_url: string; marking_evidence: string[]; status: "marking_assisted_review" }[];
   conclusion: string;
   conclusion_status: "candidate_conclusion" | "needs_more_evidence";
   evidence: string[];
   recognized_markings: string[];
   next_capture: string;
   board_model_mode: "unavailable" | "torchscript";
+};
+
+export type SnapshotInspection = {
+  snapshot_component_candidates: { label: string; confidence: number; status: "review_only" }[];
+  microcontroller_evidence: { id: string; name: string; family: string; package: string; source_url: string; marking_evidence: string[]; status: "marking_assisted_review" }[];
+  recognized_markings: string[];
+  snapshot_model_mode: "torchscript" | "unavailable";
+  guidance: string;
 };
 
 const FALLBACK_DETECTIONS: CircuitDetection[] = [
@@ -88,6 +97,16 @@ export async function inferCircuitImage(image: Blob): Promise<CircuitDetection[]
   const response = await fetch(`${API_BASE_URL}/v1/detections/infer`, { method: "POST", body: form });
   if (!response.ok) throw new Error(`Inference failed with ${response.status}`);
   return ((await response.json()) as DetectionApiResponse).detections;
+}
+
+/** Inspects a saved close-up and returns review-only component and microcontroller evidence. */
+export async function inspectSnapshot(image: Blob): Promise<SnapshotInspection> {
+  if (!API_BASE_URL) throw new Error("VITE_API_BASE_URL is not configured.");
+  const form = new FormData();
+  form.append("image", image, "circuit-lens-snapshot.jpg");
+  const response = await fetch(`${API_BASE_URL}/v1/snapshot/inspect`, { method: "POST", body: form });
+  if (!response.ok) throw new Error(`Snapshot inspection failed with ${response.status}`);
+  return (await response.json()) as SnapshotInspection;
 }
 
 /** Retrieves a manufacturer-linked reference card for the detected family. */

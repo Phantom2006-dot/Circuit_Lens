@@ -7,7 +7,7 @@ Circuit Lens now runs as a **native C++ desktop application**. The primary execu
 | `native-app/` | Qt 6 desktop camera application with Component and Board inspection modes | `circuit_lens_desktop` |
 | `backend-cpp/` | Native C++ TorchScript/OCR core and optional HTTP API | `circuit_lens_native` |
 | `backend/models/` | Bundled TorchScript model artifacts and label sidecars | Shared by both C++ executables |
-| `frontend/` | Earlier React web client retained as an optional reference build | Not required for native inspection |
+| `frontend/` | React browser client with camera, snapshot, upload, correction, and review cards | Requires a reachable C++ API |
 | `backend/` | Earlier Python service plus reproducible training utilities | Training / migration reference only |
 
 ## Build and run the full native app
@@ -42,8 +42,18 @@ cmake --build build -j1
 
 It exposes health, catalog, board, multipart component inference, board hardware identification, and review-only topology endpoints. Use `backend-cpp/env.template` as the configuration reference.
 
+## Browser preview and snapshot review
+
+The browser workspace now supports **Snapshot**, **Upload**, and **Tell us what it is** controls. A snapshot or uploaded image is sent to `POST /v1/snapshot/inspect`, which returns close-up component rankings, curated exact microcontroller-marking evidence, and capture guidance. Rankings remain review-only. A supplied correction is saved locally in the browser as `user_supplied_not_model_verified`; it never changes the model result by itself.
+
+For local or hosted preview development, `vite.config.ts` proxies `/native-api/*` to the C++ service. Vite documents `server.proxy` as a development-server proxy, so a production browser deployment still needs the C++ HTTP service deployed at a durable HTTPS URL and provided through `VITE_API_BASE_URL`. [1]
+
 ## Inspection safeguards
 
 Component detections remain **Review** candidates because the measured broad-vocabulary component baseline is not sufficient for verified part identification. Board mode accepts a candidate only when the trained-model confidence/margin gate passes or a clear allowed direct marking, such as `ESP32-CAM`, `AI-THINKER`, or `ARDUINO NANO ESP32`, is read. The application does not infer electrical continuity, hidden PCB layers, exact part numbers, or safe operating conditions from a camera frame.
 
 For build details, C++ architecture, validation results, limitations, and citations, read [NATIVE_CPP_MIGRATION.md](NATIVE_CPP_MIGRATION.md). The prior implementation reports remain available in [TECHNICAL_IMPLEMENTATION.md](TECHNICAL_IMPLEMENTATION.md), [CIRCUIT_TOPOLOGY_CHANGE_NOTE.md](CIRCUIT_TOPOLOGY_CHANGE_NOTE.md), [SMART_PERCEPTION_CHANGE_NOTE.md](SMART_PERCEPTION_CHANGE_NOTE.md), and [MODULE_RECOGNITION_RELEASE.md](MODULE_RECOGNITION_RELEASE.md).
+
+## Reference
+
+[1] [Vite, “Server Options: server.proxy.”](https://vite.dev/config/server-options.html#server-proxy)
