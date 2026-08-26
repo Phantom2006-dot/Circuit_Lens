@@ -15,6 +15,7 @@ from .catalog import all_references, references_for_family
 from .contracts import DetectionResponse, HardwareConclusionResponse, TopologyAnalysisResponse
 from .detector import create_detector, demo_detections
 from .hardware import fuse_hardware_evidence
+from .module_evidence import extract_module_markings
 from .topology import analyze_topology
 
 
@@ -113,4 +114,5 @@ async def identify_hardware(image: UploadFile = File(...)) -> HardwareConclusion
     components = detector.detect(decoded) if detector else demo_detections()
     classifier = app.state.board_classifier
     predictions = classifier.classify(decoded) if classifier else []
-    return fuse_hardware_evidence(predictions, components, "torchscript" if classifier else "unavailable")
+    markings = extract_module_markings(decoded)
+    return fuse_hardware_evidence(predictions, components, "torchscript" if classifier else "unavailable", markings)

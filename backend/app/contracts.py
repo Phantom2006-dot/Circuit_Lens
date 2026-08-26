@@ -77,6 +77,7 @@ class BoardMatch(BaseModel):
     confidence: float = Field(ge=0, le=1)
     supported_by_trained_model: bool
     component_evidence: list[str]
+    marking_evidence: list[str] = []
     visual_evidence: list[str]
     source_url: str
 
@@ -87,5 +88,6 @@ class HardwareConclusionResponse(BaseModel):
     conclusion: str
     conclusion_status: Literal["candidate_conclusion", "needs_more_evidence"]
     evidence: list[str]
+    recognized_markings: list[str] = []
     next_capture: str
     board_model_mode: Literal["unavailable", "torchscript"]

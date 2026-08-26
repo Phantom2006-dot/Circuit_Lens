@@ -46,10 +46,11 @@ export type TopologyAnalysis = {
 
 export type HardwareConclusion = {
   components: CircuitDetection[];
-  board_matches: { board_id: string; name: string; family: string; confidence: number; supported_by_trained_model: boolean; component_evidence: string[]; visual_evidence: string[]; source_url: string }[];
+  board_matches: { board_id: string; name: string; family: string; confidence: number; supported_by_trained_model: boolean; component_evidence: string[]; marking_evidence: string[]; visual_evidence: string[]; source_url: string }[];
   conclusion: string;
   conclusion_status: "candidate_conclusion" | "needs_more_evidence";
   evidence: string[];
+  recognized_markings: string[];
   next_capture: string;
   board_model_mode: "unavailable" | "torchscript";
 };

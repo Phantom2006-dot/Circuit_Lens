@@ -65,6 +65,13 @@ const FAMILY_FILTERS = [
   { key: "other", label: "Other" },
 ] as const;
 
+type InspectionMode = "component" | "board";
+
+const INSPECTION_MODES: { id: InspectionMode; label: string; summary: string; detail: string; icon: typeof Crosshair }[] = [
+  { id: "component", label: "Analyze components", summary: "Mark & classify parts", detail: "Find and classify component candidates and their locations in the current frame.", icon: Crosshair },
+  { id: "board", label: "Identify circuit board", summary: "Name the board", detail: "Use the full frame and component context to rank the board or module identity.", icon: Sparkles },
+];
+
 function ConfidenceRing({ confidence }: { confidence: number }) {
   const dash = 96 - confidence * 96;
   return (
@@ -95,6 +102,7 @@ export default function Home() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [objectQuery, setObjectQuery] = useState("");
+  const [inspectionMode, setInspectionMode] = useState<InspectionMode>("component");
   const [inferenceState, setInferenceState] = useState<"demo" | "waiting" | "sampling" | "live" | "error">("demo");
   const [reference, setReference] = useState<ComponentReference | null>(null);
   const [topology, setTopology] = useState<TopologyAnalysis | null>(null);
@@ -139,6 +147,17 @@ export default function Home() {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const frame = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
         if (!frame) throw new Error("The camera frame could not be encoded.");
+        if (inspectionMode === "board") {
+          setHardwareState("analyzing");
+          const conclusion = await identifyHardware(frame);
+          if (!active) return;
+          setHardware(conclusion);
+          setDetections(conclusion.components);
+          setSelectedId((current) => conclusion.components.some((item) => item.id === current) ? current : (conclusion.components[0]?.id ?? current));
+          setHardwareState("ready");
+          setInferenceState("live");
+          return;
+        }
         const nextDetections = await inferCircuitImage(frame);
         if (!active) return;
         setDetections(nextDetections);
@@ -152,12 +171,12 @@ export default function Home() {
     };
 
     void submitFrame();
-    const timer = window.setInterval(() => void submitFrame(), 1250);
+    const timer = window.setInterval(() => void submitFrame(), inspectionMode === "component" ? 1250 : 3000);
     return () => {
       active = false;
       window.clearInterval(timer);
     };
-  }, [cameraState, isScanning]);
+  }, [cameraState, inspectionMode, isScanning]);
 
   useEffect(() => {
     if (!selected || !hasInferenceApi()) {
@@ -258,8 +277,18 @@ export default function Home() {
     }
   };
 
+  const runFocusedAnalysis = () => {
+    if (inspectionMode === "board") {
+      void identifyBoard();
+      return;
+    }
+    if (cameraState !== "live") void startCamera();
+  };
+
   const statusLabel = cameraState === "live" ? "Live camera" : cameraState === "connecting" ? "Connecting" : cameraState === "blocked" ? "Camera blocked" : "Demo feed";
-  const inferenceLabel = inferenceState === "live" ? "MODEL LIVE" : inferenceState === "sampling" ? "SAMPLING" : inferenceState === "waiting" ? "API NOT CONFIGURED" : inferenceState === "error" ? "RETRYING" : "DEMO PASS";
+  const activeMode = INSPECTION_MODES.find((mode) => mode.id === inspectionMode)!;
+  const ModeIcon = activeMode.icon;
+  const inferenceLabel = inferenceState === "live" ? `${inspectionMode === "component" ? "COMPONENT" : "BOARD"} LIVE` : inferenceState === "sampling" ? `SAMPLING ${inspectionMode.toUpperCase()}` : inferenceState === "waiting" ? "API NOT CONFIGURED" : inferenceState === "error" ? "RETRYING" : `${inspectionMode === "component" ? "COMPONENT" : "BOARD"} READY`;
 
   return (
     <main className="app-shell">
@@ -310,13 +339,18 @@ export default function Home() {
       <section className="workspace" id="top">
         <div className="workspace__heading">
           <div>
-            <p className="eyebrow eyebrow--signal"><span /> LIVE INSPECTION</p>
-            <h1>Board 07 / component side</h1>
-            <p className="workspace__intro">Position the board under even light. The active pass anchors component evidence directly to the current frame.</p>
+            <p className="eyebrow eyebrow--signal"><span /> CHOOSE ANALYSIS</p>
+            <h1>{inspectionMode === "component" ? "Component analysis / Board 07" : "Circuit-board identification / Board 07"}</h1>
+            <p className="workspace__intro">{activeMode.detail} Position the board under even light before beginning a focused pass.</p>
+            <div className="inspection-mode-selector" role="tablist" aria-label="Choose component or circuit-board analysis">
+              {INSPECTION_MODES.map((mode) => {
+                const Icon = mode.icon;
+                return <button key={mode.id} role="tab" aria-selected={inspectionMode === mode.id} className={`inspection-mode ${inspectionMode === mode.id ? "inspection-mode--active" : ""}`} onClick={() => setInspectionMode(mode.id)}><Icon size={14} /><span><b>{mode.label}</b><small>{mode.summary}</small></span></button>;
+              })}
+            </div>
           </div>
           <div className="workspace__heading-actions">
-            <button className="secondary-button" onClick={identifyBoard} disabled={hardwareState === "analyzing"}><Sparkles size={16} /> {hardwareState === "analyzing" ? "Concluding" : "Conclude hardware"}</button>
-            <button className="secondary-button" onClick={analyzeTopology} disabled={topologyState === "analyzing"}><ClipboardCheck size={16} /> {topologyState === "analyzing" ? "Analyzing" : "Analyze topology"}</button>
+            <button className="secondary-button" onClick={runFocusedAnalysis} disabled={hardwareState === "analyzing"}><ModeIcon size={16} /> {hardwareState === "analyzing" ? "Identifying board" : inspectionMode === "component" ? "Analyze components" : "Identify circuit board"}</button>
             <button className="primary-button" onClick={startCamera} disabled={cameraState === "connecting"}>
               {cameraState === "connecting" ? <LoaderCircle className="spin" size={17} /> : <Camera size={17} />}
               {cameraState === "live" ? "Camera armed" : "Arm camera"}
@@ -327,7 +361,7 @@ export default function Home() {
         <section className="inspection-grid" aria-label="Live circuit inspection workspace">
           <article className="lens-stage">
             <div className="lens-stage__bar">
-              <div className="feed-status"><span className={`status-dot ${cameraState === "blocked" ? "status-dot--warn" : ""}`} />{statusLabel}</div>
+              <div className="feed-status"><span className={`status-dot ${cameraState === "blocked" ? "status-dot--warn" : ""}`} />{statusLabel}<b className="mode-status">{inspectionMode === "component" ? "Component mode" : "Board mode"}</b></div>
               <div className="feed-meta"><span>1920 × 1080</span><span className="feed-meta__divider" /><span>{isScanning ? "30 FPS" : "PAUSED"}</span></div>
             </div>
 
@@ -373,7 +407,7 @@ export default function Home() {
                   <div className="signal-map__legend"><span>Input trace</span><span>Component</span><span>Output trace</span></div>
                 </div>
                 {topology && <div className="topology-card"><span className="eyebrow">CIRCUIT HYPOTHESIS · REVIEW REQUIRED</span><b>{topology.candidate_patterns[0]?.label ?? "Unclassified circuit region"}</b><small>{topology.candidate_links.length} visual links · {topology.candidate_nets.length} candidate nets</small><p>{topology.candidate_patterns[0]?.evidence[0] ?? topology.limitations[0]}</p></div>}
-                {hardware && <div className={`hardware-card hardware-card--${hardware.conclusion_status === "candidate_conclusion" ? "ready" : "review"}`}><span className="eyebrow">SMART HARDWARE CONCLUSION</span><b>{hardware.conclusion}</b><small>{hardware.components.length} component candidates · {hardware.board_matches[0] ? `${Math.round(hardware.board_matches[0].confidence * 100)}% board match` : "no trained-board match"}</small><p>{hardware.evidence[0]}</p>{hardware.board_matches[1] && <em>Alternative: {hardware.board_matches[1].name} · {Math.round(hardware.board_matches[1].confidence * 100)}%</em>}<a href={hardware.board_matches[0]?.source_url} target="_blank" rel="noreferrer">Open board reference <MoveUpRight size={13} /></a></div>}
+                {hardware && <div className={`hardware-card hardware-card--${hardware.conclusion_status === "candidate_conclusion" ? "ready" : "review"}`}><span className="eyebrow">SMART HARDWARE CONCLUSION</span><b>{hardware.conclusion}</b><small>{hardware.components.length} component candidates · {hardware.board_matches[0] ? `${Math.round(hardware.board_matches[0].confidence * 100)}% board match` : "no trained-board match"}</small><p>{hardware.evidence[0]}</p>{hardware.recognized_markings.length > 0 && <em>Marking read: {hardware.recognized_markings.join(" · ")}</em>}{hardware.board_matches[1] && <em>Alternative: {hardware.board_matches[1].name} · {Math.round(hardware.board_matches[1].confidence * 100)}%</em>}<a href={hardware.board_matches[0]?.source_url} target="_blank" rel="noreferrer">Open board reference <MoveUpRight size={13} /></a></div>}
                 {reference && <div className="reference-card"><span className="eyebrow">REFERENCE MATCH</span><b>{reference.manufacturer} · {reference.part_number}</b><small>{reference.package} · {reference.reference_value}</small><a href={reference.datasheet_url} target="_blank" rel="noreferrer">Open source datasheet <MoveUpRight size={13} /></a></div>}
                 <button className="detail-link" onClick={() => setShowGuidance(true)}>Open component guide <MoveUpRight size={15} /></button>
               </>

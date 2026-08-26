@@ -1,4 +1,4 @@
-"""Smoke test the joint board-and-component conclusion endpoint on a real IoTKITs image."""
+"""Smoke test the joint board-and-component conclusion endpoint on a preserved real fixture."""
 import os
 from pathlib import Path
 
@@ -14,7 +14,9 @@ os.environ.update({
 from fastapi.testclient import TestClient  # noqa: E402
 from app.main import app  # noqa: E402
 
-image = next((Path(__file__).parents[2] / "training" / "data" / "iotkits" / "valid").glob("*.jpg"))
+iotkits_images = list((Path(__file__).parents[2] / "training" / "data" / "iotkits" / "valid").glob("*.jpg"))
+fixture_images = list((backend / "tests" / "fixtures" / "electrocom61").glob("*.jpg"))
+image = iotkits_images[0] if iotkits_images else fixture_images[0]
 with TestClient(app) as client:
     with image.open("rb") as payload:
         response = client.post("/v1/hardware/identify", files={"image": (image.name, payload, "image/jpeg")})
